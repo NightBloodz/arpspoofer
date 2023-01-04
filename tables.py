@@ -26,10 +26,14 @@ class arptable:
         for n, host in enumerate(self.table):
 
 
-            IP = host.split(' ')[0]
-            MAC = host.split(' ')[1]
+            IP = host[0]
+            MAC = host[1]
             
-            print("{}.\t|\t{}\t|\t{}\t|".format(n, IP, MAC))
+            print("\n{}.\t|\t{}\t|\t{}\t|".format(n, IP, MAC), end=" ")
+            
+            if host[2]:
+                print("\t(Spoofed)", end=" ")
+            
 
 
 
@@ -37,7 +41,7 @@ class arptable:
 
         spoof_mac = self.get_mac(spoof_ip)
         
-        self.table[ip_num] = self.table[ip_num].split(' ')[0] + " " + spoof_mac
+        self.table[ip_num] = [self.table[ip_num][0], spoof_mac, True]
         
         
 

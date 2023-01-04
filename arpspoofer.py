@@ -47,11 +47,13 @@ def arp_scan(network):
     for snd,rcv in up:
         IP = str(rcv).split(' ')[7]
         MAC = str(rcv).split(' ')[5]
-        hosts_up.append(IP + " " +MAC)
+        hosts_up.append([IP, MAC, False])
         
             
     return hosts_up
         
+    
+
     
 def show_hosts(host_list):
     
@@ -60,8 +62,8 @@ def show_hosts(host_list):
     for host in host_list:
 
 
-        IP = host.split(' ')[0]
-        MAC = host.split(' ')[1]
+        IP = host[0]
+        MAC = host[1]
         
         
        
@@ -83,7 +85,7 @@ except:
 
 while adapter:
 
-    msg = input("\n> ").split(' ')
+    msg = input("\n\n> ").split(' ')
 
     if msg[0] == "arpscan":
 
@@ -92,14 +94,20 @@ while adapter:
 
         except:
             
-            network = input("\n> Select a network to Scan (ex: 192.168.0.0/24) > ")
+            network = input("\n\n> Select a network to Scan (ex: 192.168.0.0/24) > ")
 
             host_list = arp_scan(network)
 
         show_hosts(host_list)
 
+
+
+
     elif msg[0] == "hosts":
         show_hosts(host_list)
+
+
+
 
     elif msg[0] == "arptable":
 
@@ -109,8 +117,11 @@ while adapter:
             arptables[target].show()
 
         except:
-            arptables[target] = arptable(target, host_list)
+            arptables[target] = arptable(target, host_list[:])
             arptables[target].show()
+
+
+
 
     elif msg[0] == "spoof":
 
@@ -119,18 +130,18 @@ while adapter:
         try:
             arptables[target].show() 
             
-            ip_row = int(input("> Select ARP row to spoof > "))
-            spoof_ip = input("> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
+            ip_row = int(input("\n\n> Select ARP row to spoof > "))
+            spoof_ip = input("\n\n> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
 
             arptables[target].spoof(ip_row, spoof_ip)
         
         except:
-            arptables[target] = arptable(target, host_list)
+            arptables[target] = arptable(target, host_list[:])
 
             arptables[target].show() 
             
-            ip_row = int(input("> Select ARP row to spoof > "))
-            spoof_ip = input("> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
+            ip_row = int(input("\n> Select ARP row to spoof > "))
+            spoof_ip = input("\n> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
 
             arptables[target].spoof(ip_row, spoof_ip)
             
