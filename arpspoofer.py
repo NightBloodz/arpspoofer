@@ -3,7 +3,7 @@ from scapy.all import *
 import subprocess
 import threading
 import sys
-from arptables import *
+from tables import *
 
 
 print("""
@@ -25,6 +25,13 @@ print("""
 
 
 """)
+
+host_list = []
+    
+arptables = {}
+adapter = False
+    
+
 
 
 def arp_scan(network):
@@ -56,23 +63,23 @@ def show_hosts(host_list):
         IP = host.split(' ')[0]
         MAC = host.split(' ')[1]
         
-        print("|\t{}\t|\t{}\t|".format(IP, MAC))
         
-    
+       
+        print("|\t{}\t|\t{}\t|".format(IP, MAC)) 
+       
 
+        
 
+            
+        
+        
 
-
-host_list = []
-    
-arptables = {}
-adapter = False
-    
 
 try:
     adapter = sys.argv[1]
 except:
     print("Provide a valid adapter")
+
 
 while adapter:
 
