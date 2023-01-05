@@ -1,5 +1,7 @@
 from scapy.all import *
 import copy
+import socket
+from tabulate import tabulate
 
 
 class arptable:
@@ -27,19 +29,12 @@ class arptable:
     def show(self):
             
         print("\n\n" + self.ip + " ARP TABLE:\n")
-        print("\t|\t\tIP\t|\t\tMAC\t\t|")
+        
+        header = ["IP", "MAC", "SPOOFED"]
 
-        for n, host in enumerate(self.table):
+        print(tabulate(self.table, headers = header,  tablefmt="grid"))
+            
 
-
-            IP = host[0]
-            MAC = host[1]
-            
-            print("\n{}.\t|\t{}\t|\t{}\t|".format(n, IP, MAC), end=" ")
-            
-            if host[2]:
-                print("\t(Spoofed)", end=" ")
-            
 
     def spoof(self):
 
@@ -63,7 +58,7 @@ class arptable:
 
     def mitm(self, arpip):
 
-        attacker_mac = self.get_mac("192.168.100.2") 
+        attacker_mac = self.get_mac(socket.gethostbyname(socket.gethostname())) 
 
         row = 0
         for n, r in enumerate(self.table):

@@ -1,9 +1,9 @@
 from pwn import log
 from scapy.all import *
 import subprocess
-import threading
 import sys
 from tables import *
+from tabulate import tabulate
 
 
 print("""
@@ -29,7 +29,7 @@ print("""
 host_list = []
     
 arptables = {}
-adapter = "Realtek PCIe GbE Family Controller"#False
+adapter = False
     
 
 
@@ -59,16 +59,9 @@ def arp_scan(network):
     
 def show_hosts(host_list):
     
-    print("|\t\tIP\t|\t\tMAC\t\t|")
-    
+    header = ["IP", "MAC", "HACKED"]
 
-    for host in host_list:
-
-
-        IP = host[0]
-        MAC = host[1]
-        
-        print("|\t{}\t|\t{}\t|".format(IP, MAC)) 
+    print(tabulate(host_list, headers = header,  tablefmt="grid"))
        
 
         
