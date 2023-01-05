@@ -85,7 +85,7 @@ except:
 
 while adapter:
 
-    msg = input("\n\n> ").split(' ')
+    msg = input("\n\n> ").strip().split(' ')
 
     
 
