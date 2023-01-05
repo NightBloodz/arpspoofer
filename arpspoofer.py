@@ -60,6 +60,7 @@ def arp_scan(network):
 def show_hosts(host_list):
     
     print("|\t\tIP\t|\t\tMAC\t\t|")
+    
 
     for host in host_list:
 
@@ -67,15 +68,12 @@ def show_hosts(host_list):
         IP = host[0]
         MAC = host[1]
         
-        
-       
         print("|\t{}\t|\t{}\t|".format(IP, MAC)) 
        
 
         
 
             
-        
         
 
 
@@ -89,6 +87,8 @@ while adapter:
 
     msg = input("\n\n> ").split(' ')
 
+    
+
     if msg[0] == "arpscan":
 
         host_list = arp_scan(msg[1])
@@ -101,8 +101,7 @@ while adapter:
     elif msg[0] == "hosts":
         show_hosts(host_list)
         
-
-
+        
 
 
     elif msg[0] == "arptable":
@@ -110,7 +109,7 @@ while adapter:
         target = msg[1]
         
         if (target in arptables) == False:
-            arptables[target] = arptable(target, copy.copy(host_list))
+            arptables[target] = arptable(target, copy.deepcopy(host_list))
             print("\n(Table generated)\n")
             
             
@@ -124,7 +123,7 @@ while adapter:
         target = msg[1]
 
         if (target in arptables) == False:
-            arptables[target] = arptable(target, copy.copy(host_list))
+            arptables[target] = arptable(target, copy.deepcopy(host_list))
             print("\n(Table generated)\n")
             
         
@@ -135,16 +134,42 @@ while adapter:
 
 
     elif msg[0] == "mitm":
+        
+        victim_ip1 = msg[1]
+        victim_ip2 = msg[2]
 
-        target = msg[1]
-        ip1 = msg[2]
-        ip2 = msg[3]
-
-        if (target in arptables) == False:
-            arptables[target] = arptable(target, copy.copy(host_list))
+        if (victim_ip1 in arptables) == False:
+            arptables[victim_ip1] = arptable(victim_ip1, copy.deepcopy(host_list))
             print("\n(Table generated)\n")
 
-        arptables[target].mitm()
+        if (victim_ip2 in arptables) == False:
+            arptables[victim_ip2] = arptable(victim_ip2, copy.deepcopy(host_list))
+            print("\n(Table generated)\n")
+
+
+        #modify victim1 arp table, changing victim_ip2 with attacker MAC
+        arptables[victim_ip1].mitm(victim_ip2)
+        
+        #modify victim2 arp table, changing victim_ip1 with attacker MAC
+        arptables[victim_ip2].mitm(victim_ip1)
+        
+
+
+        arptables[victim_ip1].show()
+        arptables[victim_ip2].show()
+
+    
+
+    
+    elif msg[0] == "attack":
+
+        for obj in arptables:
+            arptables[obj].attack()
+
+
+    
+
+    
         
    
 
