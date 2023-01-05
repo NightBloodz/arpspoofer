@@ -29,7 +29,7 @@ print("""
 host_list = []
     
 arptables = {}
-adapter = False
+adapter = "Realtek PCIe GbE Family Controller"#False
     
 
 
@@ -53,6 +53,8 @@ def arp_scan(network):
     return hosts_up
         
     
+
+
 
     
 def show_hosts(host_list):
@@ -89,15 +91,8 @@ while adapter:
 
     if msg[0] == "arpscan":
 
-        try:
-            host_list = arp_scan(msg[1])
-
-        except:
-            
-            network = input("\n\n> Select a network to Scan (ex: 192.168.0.0/24) > ")
-
-            host_list = arp_scan(network)
-
+        host_list = arp_scan(msg[1])
+     
         show_hosts(host_list)
 
 
@@ -105,6 +100,7 @@ while adapter:
 
     elif msg[0] == "hosts":
         show_hosts(host_list)
+        
 
 
 
@@ -113,13 +109,13 @@ while adapter:
 
         target = msg[1]
         
-        try:
-            arptables[target].show()
-
-        except:
-            arptables[target] = arptable(target, host_list[:])
-            arptables[target].show()
-
+        if (target in arptables) == False:
+            arptables[target] = arptable(target, copy.copy(host_list))
+            print("\n(Table generated)\n")
+            
+            
+        arptables[target].show()
+        
 
 
 
@@ -127,45 +123,55 @@ while adapter:
 
         target = msg[1]
 
-        try:
-            arptables[target].show() 
+        if (target in arptables) == False:
+            arptables[target] = arptable(target, copy.copy(host_list))
+            print("\n(Table generated)\n")
             
-            ip_row = int(input("\n\n> Select ARP row to spoof > "))
-            spoof_ip = input("\n\n> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
-
-            arptables[target].spoof(ip_row, spoof_ip)
         
-        except:
-            arptables[target] = arptable(target, host_list[:])
-
-            arptables[target].show() 
-            
-            ip_row = int(input("\n> Select ARP row to spoof > "))
-            spoof_ip = input("\n> Spoof IP (its corresponent MAC will be placed in row to spoof) > ")
-
-            arptables[target].spoof(ip_row, spoof_ip)
-            
-
-
-
-
+        arptables[target].spoof()
+        
 
         
 
 
+    elif msg[0] == "mitm":
+
+        target = msg[1]
+        ip1 = msg[2]
+        ip2 = msg[3]
+
+        if (target in arptables) == False:
+            arptables[target] = arptable(target, copy.copy(host_list))
+            print("\n(Table generated)\n")
+
+        arptables[target].mitm()
+        
+   
+
+        
+
+        
+
+        
+
+        
+        
+
+        
+        
+
+        
+
+        
+        
 
 
         
 
 
-            
 
-
-
-            
-
-            
 
 
     
+            
 
