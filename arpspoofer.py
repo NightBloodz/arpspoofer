@@ -3,10 +3,9 @@ from scapy.all import *
 import sys
 import argparse
 from tabulate import tabulate
-import netifaces
 from tables import *
 
-
+import netifaces
 
 print("""
 
@@ -70,10 +69,8 @@ def show_hosts(host_list):
 adapter = sys.argv[1]
 
 
-
 attacker_ip = netifaces.ifaddresses(adapter)[2][0]["addr"]    
 attacker_mac = netifaces.ifaddresses(adapter)[17][0]["addr"]
-
 
 
 attacker_addr = [attacker_ip, attacker_mac]
@@ -82,7 +79,13 @@ attacker_addr = [attacker_ip, attacker_mac]
 while adapter:
 
     #Read input user
-    msg = input("\n\n> ")
+    msg = input("\n\n> ").split(' ')
+
+    
+
+
+
+
 
     
 
