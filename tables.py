@@ -58,7 +58,9 @@ class arptable:
 
     def mitm(self, arpip):
 
-        attacker_mac = self.get_mac(socket.gethostbyname(socket.gethostname())) 
+        attacker_ip = "192.168.100.2"
+        attacker_mac = self.get_mac("192.168.100.2") 
+        
 
         row = 0
         for n, r in enumerate(self.table):

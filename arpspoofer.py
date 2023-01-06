@@ -4,6 +4,7 @@ import subprocess
 import sys
 from tables import *
 from tabulate import tabulate
+import netifaces
 
 
 print("""
@@ -73,9 +74,17 @@ def show_hosts(host_list):
 try:
     adapter = sys.argv[1]
 except:
-    print("Provide a valid adapter")
+    print("\nSelect a valid interface:\nValid interfaces:\n")
+    
+    for iface in netifaces.interfaces():
+        print(iface)
+    
+        
 
 
+        
+        
+        
 while adapter:
 
     msg = input("\n\n> ").strip().split(' ')
