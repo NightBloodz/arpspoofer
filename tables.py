@@ -8,12 +8,15 @@ class arptable:
     
     
 
-    def __init__(self, ip, table, attacker_ip):
+    def __init__(self, table, addr, attacker_addr):
 
-        self.ip = ip
+        self.ip = addr[0]
+        self.mac = addr[1]
+
+        self.attacker_ip = attacker_addr[0]
+        self.attacker_mac = attacker_addr[1]
         self.table = table
-        self.mac = self.get_mac(ip)
-        self.attacker_ip = attacker_ip
+
         
 
 
@@ -58,9 +61,6 @@ class arptable:
 
 
     def mitm(self, arpip):
-
-        
-        attacker_mac = self.get_mac(self.attacker_ip) 
         
 
         row = 0
@@ -70,8 +70,10 @@ class arptable:
                 
         
 
-        self.table[row][1] = attacker_mac
+        self.table[row][1] = self.attacker_mac
         self.table[row][2] = True
+
+        self.show()
 
 
 
