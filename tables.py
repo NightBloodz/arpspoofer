@@ -40,7 +40,7 @@ class arptable:
             
 
 
-    def spoof(self):
+    def spoof_v(self):
 
         self.show()
 
@@ -60,8 +60,7 @@ class arptable:
 
 
 
-    def mitm(self, arpip):
-        
+    def spoof(self, arpip):
 
         row = 0
         for n, r in enumerate(self.table):
@@ -75,6 +74,13 @@ class arptable:
 
         self.show()
 
+
+    def spoofall(self):
+        
+        print("All spoofed")
+        for addr in self.table:
+            addr[1] = self.attacker_mac
+            addr[2] = True
 
 
 
