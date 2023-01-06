@@ -71,14 +71,10 @@ def show_hosts(host_list):
         
 
 
-try:
-    adapter = sys.argv[1]
-except:
-    print("\nSelect a valid interface:\nValid interfaces:\n")
-    
-    for iface in netifaces.interfaces():
-        print(iface)
-    
+
+adapter = sys.argv[1]
+
+attacker_ip = netifaces.ifaddresses(adapter)[2][0]["addr"]    
         
 
 
@@ -111,7 +107,7 @@ while adapter:
         target = msg[1]
         
         if (target in arptables) == False:
-            arptables[target] = arptable(target, copy.deepcopy(host_list))
+            arptables[target] = arptable(target, copy.deepcopy(host_list), attacker_ip)
             print("\n(Table generated)\n")
             
             
@@ -125,7 +121,7 @@ while adapter:
         target = msg[1]
 
         if (target in arptables) == False:
-            arptables[target] = arptable(target, copy.deepcopy(host_list))
+            arptables[target] = arptable(target, copy.deepcopy(host_list), attacker_ip)
             print("\n(Table generated)\n")
             
         
@@ -141,11 +137,11 @@ while adapter:
         victim_ip2 = msg[2]
 
         if (victim_ip1 in arptables) == False:
-            arptables[victim_ip1] = arptable(victim_ip1, copy.deepcopy(host_list))
+            arptables[victim_ip1] = arptable(victim_ip1, copy.deepcopy(host_list), attacker_ip)
             print("\n(Table generated)\n")
 
         if (victim_ip2 in arptables) == False:
-            arptables[victim_ip2] = arptable(victim_ip2, copy.deepcopy(host_list))
+            arptables[victim_ip2] = arptable(victim_ip2, copy.deepcopy(host_list), attacker_ip)
             print("\n(Table generated)\n")
 
 
