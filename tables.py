@@ -32,11 +32,11 @@ class arptable:
 
     def show(self):
             
-        print("\n\n" + self.ip + " ARP TABLE:\n")
-        
+        print()
+        print(self.ip + " Arp Table")
         header = ["IP", "MAC", "SPOOFED"]
 
-        print(tabulate(self.table, headers = header,  tablefmt="grid"))
+        print(tabulate(self.table, headers = header,  tablefmt="grid", showindex="always"))
             
 
 
@@ -77,7 +77,7 @@ class arptable:
 
     def spoofall(self):
         
-        print("All spoofed")
+        print(self.ip + ": All arp table spoofed")
         for addr in self.table:
             addr[1] = self.attacker_mac
             addr[2] = True
@@ -97,6 +97,17 @@ class arptable:
                 send(packet, verbose=False)
 
                 print("\nsent to {}: {} is at {}".format(self.ip, spoof_ip, spoof_mac))
+
+
+
+    def restore(self, table2restore):
+        self.table = table2restore
+
+        for addr in self.table:
+            addr[2] = False
+
+        print(self.ip + ": All arp tables restored")
+
     
 
         

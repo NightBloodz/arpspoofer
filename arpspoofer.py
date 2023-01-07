@@ -4,6 +4,7 @@ import sys
 import argparse
 from tabulate import tabulate
 from tables import *
+import os
 
 import netifaces
 
@@ -31,6 +32,7 @@ arptable --target 192.168.0.2                   (Show arp table of target)
 spoof --target 192.168.0.3                      (Spoof arp table of target)
 mitm --target 192.168.0.3 192.168.0.1           (Intercept trafic between 2 targets)
 spoofall                                        (Spoof arp tables of all hosts)
+restore                                         (Restore all arp tables)
 
 attack                                          (Apply arp tables and execute attack)
 
@@ -92,10 +94,11 @@ while adapter:
 
     arpscan --network 192.168.0.0/24                (Scan the provided network)
     hosts                                           (Show the hosts found)
-    arptable --target 192.168.0.2                   (Show arp table of 1 target)
+    arptable --target 192.168.0.2                   (Show arp table of 1 target before exec attack)
     spoof --target 192.168.0.3                      (Spoof arp table of 1 target)
     mitm -t 192.168.0.3 -t2 192.168.0.1             (Intercept trafic between 2 targets)
     spoofall                                        (Spoof arp tables of all hosts)
+    restore                                         (Restore all arp tables)
 
     attack                                          (Apply arp tables and execute attack)
     """)
@@ -106,16 +109,23 @@ while adapter:
     arg_parser.add_argument("-t2", "--target2")
     arg_parser.add_argument("-n", "--network")
      
-    args = arg_parser.parse_args(args)
+    try: 
+        args = arg_parser.parse_args(args)
+        action = args.action
+        target_ip = args.target
+        target_ip2 = args.target2
+        network = args.network
+    except:
+        print(args)
+        print("Invalid arguments")
+        continue
 
-    action = args.action
-    target_ip = args.target
-    target_ip2 = args.target2
-    network = args.network
+
+    
 
       
 
-    
+        
     if action == "arpscan":
         host_list = arp_scan(network)
         show_hosts(host_list)
@@ -141,10 +151,27 @@ while adapter:
         for addr in host_list:
             arptables[addr[0]].spoofall()
 
+    if action == "restore":
+        for addr in host_list:
+            arptables[addr[0]].restore(copy.deepcopy(host_list))
+            
 
     if action == "attack":
+        os.system("echo 1 | tee /proc/sys/net/ipv4/ip_forward")
         for addr in host_list:
             arptables[addr[0]].attack()
+
+
+    if action == "exit":
+        os.system("echo 0 | tee /proc/sys/net/ipv4/ip_forward")
+        for addr in host_list:
+            arptables[addr[0]].restore(copy.deepcopy(host_list))
+        for addr in host_list:
+            arptables[addr[0]].attack()
+
+        print("Exiting and restoring tables")
+        break
+
 
     
         
