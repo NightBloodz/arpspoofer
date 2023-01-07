@@ -3,7 +3,7 @@ from scapy.all import *
 import sys
 import argparse
 from tabulate import tabulate
-from tables import *
+from tables.tables import *
 
 import netifaces
 
