@@ -138,22 +138,36 @@ while adapter:
         show_hosts(host_list)
     
     if action == "spoof":
+        for addr in host_list:
+            if addr[0] == target_ip:
+                addr[2] = True
+
         arptables[target_ip].spoof_v()
 
     if action == "arptable":
         arptables[target_ip].show()
 
     if action == "mitm":
+
+        for addr in host_list:
+            if addr[0] == target_ip:
+                addr[2] = True
+            if addr[0] == target_ip2:
+                addr[2] = True
+
         arptables[target_ip].spoof(target_ip2)
         arptables[target_ip2].spoof(target_ip)
 
     if action == "spoofall":
         for addr in host_list:
+            addr[2] = True
             arptables[addr[0]].spoofall()
 
     if action == "restore":
         for addr in host_list:
+            addr[2] = False
             arptables[addr[0]].restore(copy.deepcopy(host_list))
+        
             
 
     if action == "attack":

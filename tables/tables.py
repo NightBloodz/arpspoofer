@@ -17,6 +17,9 @@ class arptable:
         self.attacker_mac = attacker_addr[1]
         self.table = table
 
+        for addr in self.table:
+            addr[2] = False
+
         
 
 
