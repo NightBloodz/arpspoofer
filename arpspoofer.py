@@ -100,7 +100,7 @@ while adapter:
     spoofall                                        (Spoof arp tables of all hosts)
     restore                                         (Restore all arp tables)
 
-    attack                                          (Apply arp tables and execute attack)
+    attack (--noforward)                            (Apply arp tables and execute attack)
     """)
 
 
@@ -108,7 +108,10 @@ while adapter:
     arg_parser.add_argument("-t", "--target")
     arg_parser.add_argument("-t2", "--target2")
     arg_parser.add_argument("-n", "--network")
-     
+    arg_parser.add_argument("-nf", "--noforward", action="store_true" help="(Disable forwarding packets to the victims. Useful to cut victim connection)")
+
+
+    
     try: 
         args = arg_parser.parse_args(args)
         action = args.action
@@ -171,7 +174,14 @@ while adapter:
             
 
     if action == "attack":
-        os.system("echo 1 | tee /proc/sys/net/ipv4/ip_forward")
+        
+        if args.noforward == False:
+            os.system("echo 1 | tee /proc/sys/net/ipv4/ip_forward")
+            print("Forwarding packets enabled")
+        else:
+            os.system("echo 0 | tee /proc/sys/net/ipv4/ip_forward")
+            print("Forwarding packets disabled")
+        
         for addr in host_list:
             arptables[addr[0]].attack()
 
