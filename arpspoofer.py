@@ -108,7 +108,7 @@ while adapter:
     arg_parser.add_argument("-t", "--target")
     arg_parser.add_argument("-t2", "--target2")
     arg_parser.add_argument("-n", "--network")
-    arg_parser.add_argument("-nf", "--noforward", action="store_true" help="(Disable forwarding packets to the victims. Useful to cut victim connection)")
+    arg_parser.add_argument("-nf", "--noforward", action="store_true", help="(Disable forwarding packets to the victims. Useful to cut victim connection)")
 
 
     
