@@ -5,8 +5,6 @@ from tabulate import tabulate
 
 
 class arptable:
-    
-    
 
     def __init__(self, table, addr, attacker_addr):
 

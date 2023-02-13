@@ -4,7 +4,7 @@ import sys
 import argparse
 from tabulate import tabulate
 from tables.tables import *
-import os
+import os, socket
 
 import netifaces
 
@@ -51,7 +51,7 @@ def arp_scan(network):
     hosts_up = []
 
     conf.verb = 0
-
+    
     print("Scanning network (ARP)...")
     
     up, down = srp(Ether(dst = "ff:ff:ff:ff:ff:ff")/ARP(pdst = network), timeout = 3, iface = adapter, inter = 0.1)
@@ -60,6 +60,10 @@ def arp_scan(network):
         IP = str(rcv).split(' ')[7]
         MAC = str(rcv).split(' ')[5]
         hosts_up.append([IP, MAC, False])
+    
+    
+    
+    hosts_up.append([attacker_addr[0], attacker_addr[1], "own"])
         
             
     return hosts_up
@@ -122,10 +126,6 @@ while adapter:
         print(args)
         print("Invalid arguments")
         continue
-
-
-    
-
       
 
         
