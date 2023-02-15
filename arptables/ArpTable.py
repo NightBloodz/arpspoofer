@@ -124,20 +124,34 @@ class ArpTable:
 
 
 
-
-
-
     def restore(self):
-        
-        self.table = copy.deepcopy(ArpTable.table)
-
+                
         for n, addr in enumerate(self.table):
-            if addr[2] == "ATTACKER":
-                continue
+
+
+            if addr[2] == "SPOOFED":
+                self.table[n][1] = ArpTable.table[n][1]
+
+                #Send restore packets
+                restored_ip = addr[0]
+                restored_mac = addr[1]
+
+                packet = scapy.ARP(op = 2, pdst = self.IP, hwdst = self.MAC, hwsrc = restored_mac, psrc = restored_ip)
+
+                scapy.send(packet, verbose=False)
+
+                print("\nsent to {}: {} is at {}".format(self.IP, restored_ip, restored_mac))
+
+                self.table[n][2] = "FREE"
+                
+
             if addr[0] == self.IP:
                 ArpTable.table[n][2] = "FREE"
 
-            self.table[n][2] = "FREE"
+            
+            
+
+            
 
     
     def attack(self):
