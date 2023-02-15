@@ -9,7 +9,7 @@ victims = {}
 
 while True:
 
-    cmd = input('> ').split(' ')
+    cmd = input('\n> ').split(' ')
 
     if cmd[0] == 'scan':
 

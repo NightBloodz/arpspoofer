@@ -56,11 +56,13 @@ class ArpTable:
         ArpTable.table.append(address)
 
 
+
+
+
     def show(self):
         """This method prints the Arp Table of the victim"""
         
-        print("\n-------------------------------------------------------")
-        print("Arp Table of " + self.IP)
+        print("\nARP TABLE OF " + self.IP)
         header = ["IP", "MAC", "STATUS"]
         print(tabulate(self.table, headers = header,  tablefmt="grid", showindex="always"))
 
