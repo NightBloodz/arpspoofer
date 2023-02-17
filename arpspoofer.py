@@ -5,6 +5,44 @@ import os
 
 #Dictionary to save all the objects, the Key of each object will be the IP of the victim table
 victims = {}
+help = """
+scan 192.168.0.0/24         (Scan network)
+
+hosts                       (List hosts)
+
+arptable 192.168.1.2        (Show an arptable of a victim)
+
+spoof 192.168.1.4           (Spoof an arptable row of a victim)
+
+fullspoof 192.168.1.4       (Full Spoof an arptable of a victim)
+
+spoofall                    (Spoof all arptables)
+
+mitm 192.168.100.3 192.168.100.2       (Man in The middle between 2 IPs)
+
+attack                      (Apply the changes in all tables doing an arpspoofing attack)
+
+restore all                 (Restore the original arptables doing arpspoofing attack)
+"""
+
+print("""
+
+|-----------------------------------------------------------------------|
+||                                                                     ||
+||       _    ____  ____  ____  ____   ___   ___  _____ _____ ____     ||
+||      / \  |  _ \|  _ \/ ___||  _ \ / _ \ / _ \|  ___| ____|  _ \    ||
+||     / _ \ | |_) | |_) \___ \| |_) | | | | | | | |_  |  _| | |_) |   ||
+||    / ___ \|  _ <|  __/ ___) |  __/| |_| | |_| |  _| | |___|  _ <    ||
+||   /_/   \_|_| \_|_|   |____/|_|    \___/ \___/|_|   |_____|_| \_\   ||
+||                                                                     ||
+||                                                                     ||
+||   By: xalvarex                                                      ||
+||   Github: https://github.com/nightbloodz/                           ||
+||                                                                     || 
+|-----------------------------------------------------------------------|
+""")
+
+print(help)
 
 
 while True:
@@ -23,7 +61,9 @@ while True:
                 victims[victim[0]].IP = victim[0]
                 victims[victim[0]].MAC = victim[1]
 
-
+    if cmd[0] == "help":
+        print(help)
+        continue
 
     if ArpTable.table == []:
         print("Scan the network before " + cmd[0])
